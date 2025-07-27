@@ -1,35 +1,19 @@
--- 🦐 Shrimp Hub - Unified Script
-
 local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 
-local function createWindow()
-    return Rayfield:CreateWindow({
-        Name = "Shrimp Hub",
-        LoadingTitle = "Shrimp Hub",
-        LoadingSubtitle = "by Team TriOps",
-        ConfigurationSaving = {
-            Enabled = true,
-            FolderName = "ShrimpHub",
-            FileName = "Settings"
-        },
-        Discord = {
-            Enabled = false,
-            Invite = "", -- Optional
-            RememberJoins = true
-        },
-        KeySystem = false
-    })
-end
-
 local placeId = game.PlaceId
-local window = createWindow()
-
-------------------------------------------
--- 🕹️ Game-Specific Scripts
-------------------------------------------
+local window = Rayfield:CreateWindow({
+    Name = "Shrimp Hub",
+    LoadingTitle = "Shrimp Hub",
+    LoadingSubtitle = "by Team TriOps",
+    ConfigurationSaving = {
+        Enabled = false,
+        FolderName = "shrimphub",
+        FileName = "Settings"
+    },
+    KeySystem = false
+})
 
 if placeId == 140374914197602 then
-    -- Speed Clicker
     local FarmTab = window:CreateTab("Auto Farm", nil)
     FarmTab:CreateSection("Auto Actions")
 
@@ -71,30 +55,128 @@ if placeId == 140374914197602 then
         end
     })
 
-    -- Add more Speed Clicker tabs here as needed
+    _G.AutoClaimGifts = false
+    FarmTab:CreateToggle({
+        Name = "Auto Claim Gifts",
+        CurrentValue = false,
+        Callback = function(state)
+            _G.AutoClaimGifts = state
+            if state then
+                task.spawn(function()
+                    while _G.AutoClaimGifts do
+                        for i = 1, 7 do
+                            local args = {"TimeGift", tostring(i)}
+                            pcall(function()
+                                game:GetService("ReplicatedStorage").Recv:InvokeServer(unpack(args))
+                            end)
+                            task.wait(0.2)
+                        end
+                        task.wait(5)
+                    end
+                end)
+            end
+        end
+    })
 
-else
-------------------------------------------
--- 🌐 Universal Script (Fallback)
-------------------------------------------
+    _G.AutoSpin = false
+    FarmTab:CreateToggle({
+        Name = "Auto Spin",
+        CurrentValue = false,
+        Callback = function(state)
+            _G.AutoSpin = state
+            if state then
+                task.spawn(function()
+                    while _G.AutoSpin do
+                        pcall(function()
+                            game:GetService("ReplicatedStorage").SpinFolder.Spin:FireServer()
+                        end)
+                        task.wait(5)
+                    end
+                end)
+            end
+        end
+    })
 
-    local UniTab = window:CreateTab("Universal", nil)
-    UniTab:CreateSection("Useful Utilities")
+    local EggsTab = window:CreateTab("Eggs", nil)
+    EggsTab:CreateSection("Egg Hatching")
 
-    -- Example: Load custom scripts with buttons
-    local customScripts = {
-        ["Inf Yield Admin"] = "loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()",
-        ["Simple Fly"] = "loadstring(game:HttpGet('https://pastebin.com/raw/V3vvxk5N'))()"
-        -- Add your own scripts here
+    local eggOptions = {
+        "Noob", "Starter", "Rare", "Epic", "Pro", "Mythical", "Legendary", "Godly",
+        "Candy", "Beach", "Dark", "Void", "Desert", "Steampunk", "Forest", "Heaven", "Sugar", "Hell"
     }
 
-    for name, code in pairs(customScripts) do
-        UniTab:CreateButton({
+    _G.EggName = eggOptions[1]
+    EggsTab:CreateDropdown({
+        Name = "Select Egg",
+        Options = eggOptions,
+        CurrentOption = {eggOptions[1]},
+        MultipleOptions = false,
+        Callback = function(selected)
+            _G.EggName = selected[1]
+        end
+    })
+
+    _G.AutoOpenEgg = false
+    EggsTab:CreateToggle({
+        Name = "Auto Open Egg",
+        CurrentValue = false,
+        Callback = function(state)
+            _G.AutoOpenEgg = state
+            if state then
+                task.spawn(function()
+                    while _G.AutoOpenEgg do
+                        local args = {_G.EggName, "Single"}
+                        pcall(function()
+                            game:GetService("ReplicatedStorage").RemoteEvents.EggOpened:InvokeServer(unpack(args))
+                        end)
+                        task.wait(2)
+                    end
+                end)
+            end
+        end
+    })
+
+    local PetsTab = window:CreateTab("Pets", nil)
+    PetsTab:CreateSection("Pet Management")
+
+    _G.AutoEquipBest = false
+    PetsTab:CreateToggle({
+        Name = "Auto Equip Best Pets",
+        CurrentValue = false,
+        Callback = function(state)
+            _G.AutoEquipBest = state
+            if state then
+                task.spawn(function()
+                    while _G.AutoEquipBest do
+                        local args = {
+                            "EquipBest",
+                            {Pets = {}}
+                        }
+                        pcall(function()
+                            game:GetService("ReplicatedStorage").RemoteEvents.PetActionRequest:InvokeServer(unpack(args))
+                        end)
+                        task.wait(10)
+                    end
+                end)
+            end
+        end
+    })
+
+else
+    local UniversalTab = window:CreateTab("Universal", nil)
+    UniversalTab:CreateSection("Custom Scripts")
+
+    local scripts = {
+        ["Infinite Yield"] = "loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()",
+        ["Nameless Admin"] = "loadstring(game:HttpGet('https://raw.githubusercontent.com/ltseverydayyou/Nameless-Admin/main/Source.lua'))()"
+    }
+
+    for name, code in pairs(scripts) do
+        UniversalTab:CreateButton({
             Name = name,
             Callback = function()
                 loadstring(code)()
             end
         })
     end
-
 end
