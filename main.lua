@@ -68,7 +68,7 @@ FarmTab:CreateToggle({
                         local player = game:GetService("Players").LocalPlayer
                         local gui = player:WaitForChild("PlayerGui"):WaitForChild("GiftUI"):WaitForChild("Frame")
                         
-                        for i = 1, 12 do
+                        for i = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 do
                             local gift = gui:FindFirstChild("Gift" .. i)
                             if gift and gift:FindFirstChild("Claim") and gift.Claim.Visible then
                                 local args = {"TimeGift", tostring(i)}
