@@ -142,28 +142,28 @@ FarmTab:CreateToggle({
     local PetsTab = window:CreateTab("Pets", nil)
     PetsTab:CreateSection("Pet Management")
 
-    _G.AutoEquipBest = false
-    PetsTab:CreateToggle({
-        Name = "Auto Equip Best Pets",
-        CurrentValue = false,
-        Callback = function(state)
-            _G.AutoEquipBest = state
-            if state then
-                task.spawn(function()
-                    while _G.AutoEquipBest do
+_G.AutoEquipBest = false
+PetsTab:CreateToggle({
+    Name = "Auto Equip Best Pets",
+    CurrentValue = false,
+    Callback = function(state)
+        _G.AutoEquipBest = state
+        if state then
+            task.spawn(function()
+                while _G.AutoEquipBest do
+                    pcall(function()
                         local args = {
-                            "EquipBest",
-                            {Pets = {}}
+                            [1] = "EquipBest",
+                            [2] = { Pets = {} }
                         }
-                        pcall(function()
-                            game:GetService("ReplicatedStorage").RemoteEvents.PetActionRequest:InvokeServer(unpack(args))
-                        end)
-                        task.wait(10)
-                    end
-                end)
-            end
+                        game:GetService("ReplicatedStorage").RemoteEvents.PetActionRequest:InvokeServer(unpack(args))
+                    end)
+                    task.wait(10) -- Adjust this if you want faster or slower repeats
+                end
+            end)
         end
-    })
+    end
+})
 
 else
     local UniversalTab = window:CreateTab("Universal", nil)
