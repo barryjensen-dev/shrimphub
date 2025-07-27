@@ -65,22 +65,13 @@ FarmTab:CreateToggle({
             task.spawn(function()
                 while _G.AutoClaimGifts do
                     pcall(function()
-                        local player = game:GetService("Players").LocalPlayer
-                        local playerGui = player:WaitForChild("PlayerGui")
-
-                        local giftUI = playerGui:FindFirstChild("GiftUI")
-                        if not giftUI then return end
-
-                        local frame = giftUI:FindFirstChild("Frame")
-                        if not frame then return end
-
                         for i = 1, 12 do
-                            local gift = frame:FindFirstChild("Gift" .. i)
-                            if gift and gift:FindFirstChild("Claim") and gift.Claim.Visible then
-                                local args = {"TimeGift", tostring(i)}
-                                game:GetService("ReplicatedStorage").Recv:InvokeServer(unpack(args))
-                                task.wait(0.3)
-                            end
+                            local args = {
+                                [1] = "TimeGift",
+                                [2] = tostring(i)
+                            }
+                            game:GetService("ReplicatedStorage"):WaitForChild("Recv"):InvokeServer(unpack(args))
+                            task.wait(0.2)
                         end
                     end)
                     task.wait(5)
