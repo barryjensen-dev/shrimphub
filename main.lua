@@ -55,28 +55,34 @@ if placeId == 140374914197602 then
         end
     })
 
-    _G.AutoClaimGifts = false
-    FarmTab:CreateToggle({
-        Name = "Auto Claim Gifts",
-        CurrentValue = false,
-        Callback = function(state)
-            _G.AutoClaimGifts = state
-            if state then
-                task.spawn(function()
-                    while _G.AutoClaimGifts do
-                        for i = 1, 7 do
-                            local args = {"TimeGift", tostring(i)}
-                            pcall(function()
+_G.AutoClaimGifts = false
+FarmTab:CreateToggle({
+    Name = "Auto Claim Gifts",
+    CurrentValue = false,
+    Callback = function(state)
+        _G.AutoClaimGifts = state
+        if state then
+            task.spawn(function()
+                while _G.AutoClaimGifts do
+                    pcall(function()
+                        local player = game:GetService("Players").LocalPlayer
+                        local gui = player:WaitForChild("PlayerGui"):WaitForChild("GiftUI"):WaitForChild("Frame")
+                        
+                        for i = 1, 12 do
+                            local gift = gui:FindFirstChild("Gift" .. i)
+                            if gift and gift:FindFirstChild("Claim") and gift.Claim.Visible then
+                                local args = {"TimeGift", tostring(i)}
                                 game:GetService("ReplicatedStorage").Recv:InvokeServer(unpack(args))
-                            end)
-                            task.wait(0.2)
+                                task.wait(0.2)
+                            end
                         end
-                        task.wait(5)
-                    end
-                end)
-            end
+                    end)
+                    task.wait(5)
+                end
+            end)
         end
-    })
+    end
+})
 
     _G.AutoSpin = false
     FarmTab:CreateToggle({
